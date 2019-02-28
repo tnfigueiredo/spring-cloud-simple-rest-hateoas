@@ -5,37 +5,15 @@ package com.sample.tnfigueiredo.vo;
 
 import java.util.List;
 
-import org.springframework.hateoas.Resource;
-
 /**
- * Value Object to represent a Search result and its metadata. 
- *
  * @author tnfigueiredo
  *
  */
-public class SearchVO<T extends Object> {
-	
-	private int pageSize;
+public class SearchVO<T> {
 	
 	private int total;
 	
-	private int currentPage;
-	
-	private List<Resource<T>> result;
-
-	public SearchVO(List<Resource<T>> searchResult, int pageSize) {
-		this.pageSize = pageSize;
-		this.total = searchResult.size();
-		this.currentPage = 1;
-		this.result = searchResult;
-	}
-	
-	/**
-	 * @return the pageSize
-	 */
-	public int getPageSize() {
-		return pageSize;
-	}
+	private List<T> items;
 
 	/**
 	 * @return the total
@@ -45,24 +23,24 @@ public class SearchVO<T extends Object> {
 	}
 
 	/**
-	 * @return the result
+	 * @param total the total to set
 	 */
-	public List<Resource<T>> getResult() {
-		return result;
+	public void setTotal(int total) {
+		this.total = total;
 	}
 
 	/**
-	 * @return the currentPage
+	 * @return the books
 	 */
-	public int getCurrentPage() {
-		return currentPage;
+	public List<T> getItems() {
+		return items;
 	}
 
 	/**
-	 * @param currentPage the currentPage to set
+	 * @param books the books to set
 	 */
-	public void setCurrentPage(int currentPage) {
-		this.currentPage = currentPage;
+	public void setItems(List<T> books) {
+		this.items = books;
 	}
-	
+
 }

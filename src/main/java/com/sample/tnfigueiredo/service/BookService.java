@@ -1,9 +1,8 @@
 package com.sample.tnfigueiredo.service;
 
-import java.util.List;
-
 import com.sample.tnfigueiredo.exception.SampleException;
 import com.sample.tnfigueiredo.model.Book;
+import com.sample.tnfigueiredo.vo.SearchVO;
 
 public interface BookService {
 
@@ -18,7 +17,7 @@ public interface BookService {
 	 * @return return all books registered
 	 * @throws SampleException
 	 */
-	List<Book> listAll(int startIndex, int numberItens) throws SampleException;
+	SearchVO<Book> listAll(int startIndex, int numberItens) throws SampleException;
 	
 	/**
 	 * Find a Book by Id.

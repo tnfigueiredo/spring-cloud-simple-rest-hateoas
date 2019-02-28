@@ -20,6 +20,7 @@ import org.springframework.util.ResourceUtils;
 import com.sample.tnfigueiredo.exception.SampleException;
 import com.sample.tnfigueiredo.model.Book;
 import com.sample.tnfigueiredo.service.BookService;
+import com.sample.tnfigueiredo.vo.SearchVO;
 
 /**
  * Sample for a CRUD Service for Books 
@@ -38,11 +39,16 @@ public class BookServiceImpl implements BookService {
 	 * (non-Javadoc)
 	 * @see com.sample.tnfigueiredo.service.BookService#listAll()
 	 */
-	public List<Book> listAll(int startIndex, int numberItens) throws SampleException{
-		List<Book> result = new ArrayList<>();
+	public SearchVO<Book> listAll(int startIndex, int numberItens) throws SampleException{
+		if(startIndex < 1 || startIndex > books.size()) {
+			throw new SampleException("Invalid Page Size.");
+		}
 		List<Book> allBooks = Collections.list(getBooks().elements());
-		for(int i = startIndex - 1; (i < allBooks.size() && i < startIndex + numberItens); i++) {
-			result.add(allBooks.get(i));
+		SearchVO<Book> result = new SearchVO<>();
+		result.setTotal(allBooks.size());
+		result.setItems(new ArrayList<>());
+		for(int i = startIndex - 1; (i < allBooks.size() && i < startIndex + numberItens - 1); i++) {
+			result.getItems().add(allBooks.get(i));
 		}
 		return result;
 	}

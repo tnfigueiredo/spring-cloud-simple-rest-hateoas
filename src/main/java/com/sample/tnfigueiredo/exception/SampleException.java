@@ -25,6 +25,15 @@ public class SampleException extends Exception {
 	 * 
 	 * @param e
 	 */
+	public SampleException(String e) {
+		super("Problem at project execution: " + e);
+	}
+	
+	/**
+	 * Default Constructor to Handle exceptions at the project.
+	 * 
+	 * @param e
+	 */
 	public SampleException(Exception e) {
 		super("Problem at project execution", e);
 	}

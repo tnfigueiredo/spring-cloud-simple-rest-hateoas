@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sample.tnfigueiredo.exception.SampleException;
 import com.sample.tnfigueiredo.model.Book;
 import com.sample.tnfigueiredo.service.BookService;
+import com.sample.tnfigueiredo.vo.ResearchSearchVO;
 import com.sample.tnfigueiredo.vo.SearchVO;
 
 /**
@@ -56,12 +57,13 @@ public class BooksController {
 	 */
 	@RequestMapping(params= {"pageSize", "currentPage"})
 	@GetMapping
-	public HttpEntity<Resource<SearchVO<Book>>> listBooks(
+	public HttpEntity<Resource<ResearchSearchVO<Book>>> listBooks(
 			@RequestParam(value="pageSize", required=false) int pageSize, 
 			@RequestParam(value="currentPage", required=false) int currentPage) throws SampleException{
 		int startIndex = (pageSize!=0?pageSize:5)*(currentPage!=0?currentPage:1) - (pageSize - 1);
-		SearchVO<Book> searchVo = new SearchVO<>(createBookResources(bookService.listAll(startIndex, pageSize)), pageSize);
-		Resource<SearchVO<Book>> books = new Resource<>(searchVo);
+		SearchVO<Book> resultSearch = bookService.listAll(startIndex, pageSize);
+		ResearchSearchVO<Book> searchVo = new ResearchSearchVO<>(createBookResources(resultSearch.getItems()), pageSize, resultSearch.getTotal());
+		Resource<ResearchSearchVO<Book>> books = new Resource<>(searchVo);
 		return new ResponseEntity<>(books, HttpStatus.OK);
 	}
 	
