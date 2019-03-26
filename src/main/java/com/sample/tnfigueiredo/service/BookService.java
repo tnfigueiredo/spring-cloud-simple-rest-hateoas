@@ -45,7 +45,9 @@ public interface BookService {
 	 * Book to be deleted by id.
 	 * 
 	 * @param id
+	 * 
+	 * @exception SampleException
 	 */
-	void delete(Long id);
+	void delete(Long id) throws SampleException;
 	
 }

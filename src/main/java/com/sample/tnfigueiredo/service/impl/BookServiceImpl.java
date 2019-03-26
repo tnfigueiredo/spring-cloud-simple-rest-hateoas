@@ -83,8 +83,8 @@ public class BookServiceImpl implements BookService {
 	 * (non-Javadoc)
 	 * @see com.sample.tnfigueiredo.service.BookService#delete(java.lang.Long)
 	 */
-	public void delete(Long id) {
-		
+	public void delete(Long id) throws SampleException {
+		getBooks().remove(id);
 	}
 	
 	/**
@@ -114,10 +114,10 @@ public class BookServiceImpl implements BookService {
 	 * Get the last higher key
 	 */
 	private Long getNextBookId() throws SampleException {
-		List<Long> keys = Collections.emptyList();
+		List<Long> keys = new ArrayList<>();
 		keys.addAll(getBooks().keySet());
 		Collections.sort(keys);
-		return keys.get(keys.size() - 1);
+		return keys.get(keys.size() - 1) + 1;
 	}
 
 }

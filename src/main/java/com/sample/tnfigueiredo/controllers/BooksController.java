@@ -55,11 +55,10 @@ public class BooksController {
 	 * 
 	 * @throws SampleException
 	 */
-	@RequestMapping(params= {"pageSize", "currentPage"})
 	@GetMapping
 	public HttpEntity<Resource<ResearchSearchVO<Book>>> listBooks(
-			@RequestParam(value="pageSize", required=false) int pageSize, 
-			@RequestParam(value="currentPage", required=false) int currentPage) throws SampleException{
+			@RequestParam(value="pageSize", required=false, defaultValue="5") int pageSize, 
+			@RequestParam(value="currentPage", required=false, defaultValue="1") int currentPage) throws SampleException{
 		int startIndex = (currentPage!=0?currentPage:1)*((pageSize!=0?pageSize:5) - (pageSize - 1));
 		SearchVO<Book> resultSearch = bookService.listAll(startIndex, pageSize);
 		ResearchSearchVO<Book> searchVo = new ResearchSearchVO<>(createBookResources(resultSearch.getItems()), pageSize, resultSearch.getTotal());

@@ -3,11 +3,16 @@
  */
 package com.sample.tnfigueiredo.service;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +44,7 @@ public class BookServiceTest {
 	@InjectMocks
 	private BookServiceImpl bookService;
 	
+	private BookBuilder bookBuilder;
 	
 	/**
 	 * Creating books from test file simillar to main csv.
@@ -47,7 +53,7 @@ public class BookServiceTest {
 	@Before
 	public void init() {
 		books = new Hashtable<>();
-		BookBuilder bookBuilder = new BookBuilder();
+		bookBuilder = new BookBuilder();
 		addBook(bookBuilder.setId(1L).setAuthor("Author 1").setTitle("My title 1").setPrice(20.00).build());
 		addBook(bookBuilder.setId(2L).setAuthor("Author 2").setTitle("My title 2").setPrice(21.00).build());
 		addBook(bookBuilder.setId(3L).setAuthor("Author 3").setTitle("My title 3").setPrice(22.00).build());
@@ -91,5 +97,89 @@ public class BookServiceTest {
 		bookService.listAll(books.size() + 1, 5);
 	}
 	
+	@Test
+	public void recoverExistingBookTest() throws SampleException {
+		when(booksMock.get(1L)).thenReturn(books.get(1L));
+		Book book = bookService.findById(1L);
+		assertNotNull(book);
+		assertSame(book.getId(), Long.valueOf(1L));
+	}
+	
+	@Test
+	public void recoverNonExistingBookTest() throws SampleException {
+		when(booksMock.get(books.size() + 1L)).thenReturn(books.get(books.size() + 1L));
+		Book book = bookService.findById(books.size() + 1L);
+		assertNull(book);
+	}
+	
+	@Test
+	public void removeExistingBookTest() throws SampleException {
+		int sizeBooks = books.size();
+		when(booksMock.remove(1L)).thenReturn(books.remove(1L));
+		bookService.delete(1L);
+		assertNull(books.get(1L));
+		assertSame(books.size(), sizeBooks - 1);
+	}
+	
+	@Test
+	public void removeNonExistingBookTest() throws SampleException {
+		int sizeBooks = books.size();
+		when(booksMock.remove(books.size() + 1L)).thenReturn(books.remove(books.size() + 1L));
+		bookService.delete(books.size() + 1L);
+		assertNull(books.get(books.size() + 1L));
+		assertSame(books.size(), sizeBooks);
+	}
+	
+	@Test
+	public void addNewBookTest() throws SampleException {
+		int sizeBooks = books.size();
+		List<Long> keys = new ArrayList<>();
+		keys.addAll(books.keySet());
+		Collections.sort(keys);
+		bookBuilder.clear();
+		Book newBook = bookBuilder.setAuthor("New Author").setPrice(50.00).setTitle("New Title").build();
+		when(booksMock.keySet()).thenReturn(books.keySet());
+		when(booksMock.put(keys.get(keys.size() - 1) + 1, newBook))
+			.thenReturn(books.put(keys.get(keys.size() - 1) + 1, newBook));
+		Book bookInserted = bookService.saveUpdate(newBook);
+		assertNotNull(bookInserted);
+		assertSame(books.size(), sizeBooks + 1);
+	}
+	
+	@Test
+	public void updateExistingBookTest() throws SampleException {
+		int sizeBooks = books.size();
+		bookBuilder.clear();
+		Book bookToUpdate = bookBuilder.setId(8L).setAuthor("New Author").setPrice(50.00).setTitle("New Title").build();
+		when(booksMock.get(bookToUpdate.getId())).thenReturn(books.get(bookToUpdate.getId()));
+		when(booksMock.containsKey(bookToUpdate.getId())).thenReturn(books.containsKey(bookToUpdate.getId()));
+		when(booksMock.put(bookToUpdate.getId(), bookToUpdate)).thenReturn(books.put(bookToUpdate.getId(), bookToUpdate));
+		Book bookUpdated = bookService.saveUpdate(bookToUpdate);
+		assertNotNull(bookUpdated);
+		assertSame(books.size(), sizeBooks);
+		assertSame(bookToUpdate, bookUpdated);
+		assertSame(bookToUpdate.getAuthor(), bookUpdated.getAuthor());
+		assertSame(bookToUpdate.getId(), bookUpdated.getId());
+		assertSame(bookToUpdate.getPrice(), bookUpdated.getPrice());
+		assertSame(bookToUpdate.getTitle(), bookUpdated.getTitle());
+	}
+	
+	@Test(expected=SampleException.class)
+	public void updateNonExistingBookTest() throws SampleException {
+		List<Long> keys = new ArrayList<>();
+		keys.addAll(books.keySet());
+		Collections.sort(keys);
+		bookBuilder.clear();
+		Book bookToUpdate = 
+				bookBuilder
+					.setId(keys.get(keys.size() - 1) + 1)
+					.setAuthor("New Author")
+					.setPrice(50.00)
+					.setTitle("New Title")
+					.build();
+		when(booksMock.get(bookToUpdate.getId())).thenReturn(books.get(bookToUpdate.getId()));
+		when(booksMock.containsKey(bookToUpdate.getId())).thenReturn(books.containsKey(bookToUpdate.getId()));
+		bookService.saveUpdate(bookToUpdate);
+	}
 
 }
